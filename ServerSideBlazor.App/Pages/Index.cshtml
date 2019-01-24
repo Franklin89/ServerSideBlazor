@@ -1,0 +1,43 @@
+﻿@page "/"
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+@if(userLoggedIn)
+{
+    <button onclick="@(async () => Logout())" disabled="@working">Logout</button>
+}
+else
+{
+    <button onclick="@(async () => Login())" disabled="@working">Login</button>
+}
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@functions {
+
+    bool userLoggedIn = false;
+    bool working = true;
+
+    [Inject]
+    public ServerSideBlazor.App.Services.IUserService UserService { get; set; }
+
+    async Task Login()
+    {
+        UserService.Login();
+    }
+
+    async Task Logout()
+    {
+        UserService.Logout();
+    }
+
+    protected override void OnInit()
+    {
+        UserService.UserChanged += (s,e) => {
+            userLoggedIn = !userLoggedIn;
+            try {StateHasChanged(); } catch {}
+         };
+    }
+}
